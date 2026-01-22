@@ -13,14 +13,22 @@
 #pragma once
 #include <stddef.h>
 
-#define ASFVECERR -1
-#define ASFVECERR_MEMORY -2    // Any errors regarding memory
-#define ASFVECERR_CANT_GROW -3 // Thrown for cases where the vector isn't supposed to grow but the function paramters ask it to
-
 #ifndef ASFVEC_OPT_GROWSIZE
 #define ASFVEC_OPT_GROWSIZE 10
 #endif
 
+typedef enum
+{
+    ASFVECERR_OK = 0,
+    ASFVECERR_UNKNOWN = -1,
+    ASFVECERR_MEMORY = -2,    // Any errors regarding memory
+    ASFVECERR_CANT_GROW = -3, // Thrown for cases where the vector isn't supposed to grow but the function paramters ask it to
+} AsfVecErr;
+
+/**
+ * A generic vector container which grows efficiently by keeping track
+ * of capacity and length separately.
+ */
 typedef struct
 {
     void *contents;
@@ -55,7 +63,7 @@ void asfvec_free(AsfVec *vec);
  *
  * If an error is encountered, nothing changes and the error code ASFVECERR_MEMORY is returned
  */
-int asfvec_cresize(AsfVec *vec, size_t new_cap);
+AsfVecErr asfvec_cresize(AsfVec *vec, size_t new_cap);
 
 /**
  * Resize the length of a vector, only lets reduction of the length and not growth.
@@ -63,7 +71,7 @@ int asfvec_cresize(AsfVec *vec, size_t new_cap);
  *
  * Returns ASFVECERR_CANT_GROW if the new_len is invalid in the vec's context
  */
-int asfvec_lresize(AsfVec *vec, size_t new_len);
+AsfVecErr asfvec_lresize(AsfVec *vec, size_t new_len);
 
 /**
  * Pushes a new element to the vector, appropriately allocating new space when needed.
@@ -72,7 +80,7 @@ int asfvec_lresize(AsfVec *vec, size_t new_len);
  *
  * Ideally, use asfvec_pushcpy and asfvec_pushzro
  */
-int asfvec_pushunsafe(AsfVec *vec);
+AsfVecErr asfvec_pushunsafe(AsfVec *vec);
 
 /**
  * Pushes a new element to the vector, appropriately allocating new space when needed
@@ -80,14 +88,14 @@ int asfvec_pushunsafe(AsfVec *vec);
  *
  * Returns any errors if encountered, in which case the vector is left unchanged
  */
-int asfvec_pushcpy(AsfVec *vec, void *element);
+AsfVecErr asfvec_pushcpy(AsfVec *vec, void *element);
 
 /**
  * Increments the length by one pushing a zeroed out element to the list. Returns an int depicting
  * weather the operation was successful or not. Use asfvec_last to get the pointer to the element
  * pushed by this.
  */
-int asfvec_pushzro(AsfVec *vec);
+AsfVecErr asfvec_pushzro(AsfVec *vec);
 
 // Code below this is for providing functions for inlining
 

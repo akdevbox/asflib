@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -Wall -g -D_DEBUG
+CFLAGS = -Wall -g -D_DEBUG -O0
 
 SRC_C := $(wildcard src/*.c)
 SRC_O := $(SRC_C:.c=.o)

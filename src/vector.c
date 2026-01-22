@@ -50,7 +50,7 @@ void asfvec_free(AsfVec *vec)
     free(vec);
 }
 
-int asfvec_cresize(AsfVec *vec, size_t new_cap)
+AsfVecErr asfvec_cresize(AsfVec *vec, size_t new_cap)
 {
     void *new_vec = realloc(vec->contents, vec->element_size * new_cap);
     if (new_vec == NULL)
@@ -63,22 +63,22 @@ int asfvec_cresize(AsfVec *vec, size_t new_cap)
     if (vec->length > new_cap)
         vec->length = new_cap;
 
-    return 0;
+    return ASFVECERR_OK;
 }
 
-int asfvec_lresize(AsfVec *vec, size_t new_len)
+AsfVecErr asfvec_lresize(AsfVec *vec, size_t new_len)
 {
     if (vec->length < new_len)
         return ASFVECERR_CANT_GROW;
 
     vec->length = new_len;
-    return 0;
+    return ASFVECERR_OK;
 }
 
 /**
  * Grows the vector in an optimized manner.
  */
-static int asfvec_optimized_grow(AsfVec *vec, size_t extra_size)
+static AsfVecErr asfvec_optimized_grow(AsfVec *vec, size_t extra_size)
 {
     size_t current_space = vec->capacity - vec->length;
     if (current_space >= extra_size)
@@ -94,7 +94,7 @@ static int asfvec_optimized_grow(AsfVec *vec, size_t extra_size)
     return asfvec_cresize(vec, new_capacity);
 }
 
-int asfvec_pushunsafe(AsfVec *vec)
+AsfVecErr asfvec_pushunsafe(AsfVec *vec)
 {
     int err;
 
@@ -103,10 +103,10 @@ int asfvec_pushunsafe(AsfVec *vec)
         return err;
 
     vec->length++;
-    return 0;
+    return ASFVECERR_OK;
 }
 
-int asfvec_pushcpy(AsfVec *vec, void *element)
+AsfVecErr asfvec_pushcpy(AsfVec *vec, void *element)
 {
     int err;
 
@@ -116,10 +116,10 @@ int asfvec_pushcpy(AsfVec *vec, void *element)
 
     void *new_item = asfvec_getitem(vec, vec->length - 1);
     memcpy(new_item, element, vec->element_size); // Copy the new element in
-    return 0;
+    return ASFVECERR_OK;
 }
 
-int asfvec_pushzro(AsfVec *vec)
+AsfVecErr asfvec_pushzro(AsfVec *vec)
 {
     int err;
 
@@ -129,5 +129,5 @@ int asfvec_pushzro(AsfVec *vec)
 
     void *new_item = asfvec_getitem(vec, vec->length - 1);
     memset(new_item, 0, vec->element_size);
-    return 0;
+    return ASFVECERR_OK;
 }
