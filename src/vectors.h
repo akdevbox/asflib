@@ -27,16 +27,16 @@ typedef struct
     size_t capacity;
     size_t length;
     size_t element_size;
-} AsfVector;
+} AsfVec;
 
-AsfVector *asfvec_ccreate(size_t elem_size, size_t capacity);
-AsfVector *asfvec_create(size_t elem_size);
-void asfvec_free(AsfVector *vec);
-int asfvec_cresize(AsfVector *vec, size_t new_cap);
-int asfvec_lresize(AsfVector *vec, size_t new_len);
-int asfvec_pushunsafe(AsfVector *vec);
-int asfvec_pushcpy(AsfVector *vec, void *element);
-int asfvec_pushzro(AsfVector *vec);
+AsfVec *asfvec_ccreate(size_t elem_size, size_t capacity);
+AsfVec *asfvec_create(size_t elem_size);
+void asfvec_free(AsfVec *vec);
+int asfvec_cresize(AsfVec *vec, size_t new_cap);
+int asfvec_lresize(AsfVec *vec, size_t new_len);
+int asfvec_pushunsafe(AsfVec *vec);
+int asfvec_pushcpy(AsfVec *vec, void *element);
+int asfvec_pushzro(AsfVec *vec);
 
 // Code below this is for providing functions for inlining
 
@@ -51,14 +51,14 @@ int asfvec_pushzro(AsfVector *vec);
 #include <stdlib.h>
 #include <string.h>
 /*
- * Allocates a AsfVector struct using malloc with appropriate capacity and returns it
+ * Allocates a AsfVec struct using malloc with appropriate capacity and returns it
  *
  * Returns NULL if allocation failed
  */
-AsfVector *asfvec_ccreate(size_t elem_size, size_t capacity)
+AsfVec *asfvec_ccreate(size_t elem_size, size_t capacity)
 {
     // Try to allocate the object
-    AsfVector *vec = (AsfVector *)malloc(sizeof(AsfVector));
+    AsfVec *vec = (AsfVec *)malloc(sizeof(AsfVec));
     if (vec == NULL)
         return NULL;
 
@@ -86,12 +86,12 @@ AsfVector *asfvec_ccreate(size_t elem_size, size_t capacity)
 }
 
 /*
- * Allocate an AsfVector with zero capacity by default, see asfvec_ccreate for better knowledge
+ * Allocate an AsfVec with zero capacity by default, see asfvec_ccreate for better knowledge
  * of how to create a pre-allocated capacity vector.
  *
  * Returns NULL if the allocation failed
  */
-AsfVector *asfvec_create(size_t elem_size)
+AsfVec *asfvec_create(size_t elem_size)
 {
     return asfvec_ccreate(elem_size, 0);
 }
@@ -99,7 +99,7 @@ AsfVector *asfvec_create(size_t elem_size)
 /*
  * Frees up an AsfVec
  */
-void asfvec_free(AsfVector *vec)
+void asfvec_free(AsfVec *vec)
 {
     free(vec->contents);
     free(vec);
@@ -111,7 +111,7 @@ void asfvec_free(AsfVector *vec)
  *
  * If an error is encountered, nothing changes and the error code ASFVECERR_MEMORY is returned
  */
-int asfvec_cresize(AsfVector *vec, size_t new_cap)
+int asfvec_cresize(AsfVec *vec, size_t new_cap)
 {
     void **new_vec = realloc(vec->contents, vec->element_size * new_cap);
     if (new_vec == NULL)
@@ -133,7 +133,7 @@ int asfvec_cresize(AsfVector *vec, size_t new_cap)
  *
  * Returns ASFVECERR_CANT_GROW if the new_len is invalid in the vec's context
  */
-int asfvec_lresize(AsfVector *vec, size_t new_len)
+int asfvec_lresize(AsfVec *vec, size_t new_len)
 {
     if (vec->length < new_len)
         return ASFVECERR_CANT_GROW;
@@ -145,7 +145,7 @@ int asfvec_lresize(AsfVector *vec, size_t new_len)
 /*
  * Grows the vector in an optimized manner.
  */
-static int asfvec_optimized_grow(AsfVector *vec, size_t extra_size)
+static int asfvec_optimized_grow(AsfVec *vec, size_t extra_size)
 {
     size_t current_space = vec->capacity - vec->length;
     if (current_space >= extra_size)
@@ -168,7 +168,7 @@ static int asfvec_optimized_grow(AsfVector *vec, size_t extra_size)
  *
  * Ideally, use asfvec_pushcpy and asfvec_pushzro
  */
-int asfvec_pushunsafe(AsfVector *vec)
+int asfvec_pushunsafe(AsfVec *vec)
 {
     int err;
 
@@ -186,7 +186,7 @@ int asfvec_pushunsafe(AsfVector *vec)
  *
  * Returns any errors if encountered, in which case the vector is left unchanged
  */
-int asfvec_pushcpy(AsfVector *vec, void *element)
+int asfvec_pushcpy(AsfVec *vec, void *element)
 {
     int err;
 
@@ -204,7 +204,7 @@ int asfvec_pushcpy(AsfVector *vec, void *element)
  * weather the operation was successful or not. Use asfvec_last to get the pointer to the element
  * pushed by this.
  */
-int asfvec_pushzro(AsfVector *vec)
+int asfvec_pushzro(AsfVec *vec)
 {
     int err;
 
