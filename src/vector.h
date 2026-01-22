@@ -113,7 +113,7 @@ void asfvec_free(AsfVec *vec)
  */
 int asfvec_cresize(AsfVec *vec, size_t new_cap)
 {
-    void **new_vec = realloc(vec->contents, vec->element_size * new_cap);
+    void *new_vec = realloc(vec->contents, vec->element_size * new_cap);
     if (new_vec == NULL)
         return ASFVECERR_MEMORY;
 
