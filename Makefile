@@ -1,8 +1,8 @@
 CC = clang
 CFLAGS = -Wall -g -D_DEBUG
 
-SRC_H := $(wildcard src/*.h)
-SRC_O := $(SRC_H:.h=.o)
+SRC_C := $(wildcard src/*.c)
+SRC_O := $(SRC_C:.c=.o)
 
 # main.c is supposed to be a file that you may create in this repo to experiment
 main: main.o $(SRC_O)
@@ -10,8 +10,8 @@ main: main.o $(SRC_O)
 main.o: main.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-src/%.o: src/%.h
-	$(CC) $(CFLAGS) -x c -c -DASF_IMPL -Wno-pragma-once-outside-header -Wno-unused-function -o $@ $<
+src/%.o: src/%.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 run: main
 	./main

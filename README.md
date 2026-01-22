@@ -30,17 +30,17 @@ Ideally, include the following rule into your Makefile to compile the files from
 library separately into object files
 
 ```makefile
-SRC_H := $(wildcard src/*.h)
-SRC_O := $(SRC_H:.h=.o)
+SRC_C := $(wildcard src/*.c)
+SRC_O := $(SRC_C:.c=.o)
 
-asflib/src/%.o: asflib/src/%.h
-	$(CC) $(CFLAGS) -x c -c -DASF_IMPL -Wno-pragma-once-outside-header -Wno-unused-function -o $@ $<
-
-main: main.o $(SRC_O)
-	$(CC) $(CFLAGS) -o $@ $^
+asflib/src/%.o: asflib/src/%.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 main.o: main.c
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+main: main.o $(SRC_O)
+	$(CC) $(CFLAGS) -o $@ $^
 ```
 
 where `asflib` is the folder where this repository is cloned.
